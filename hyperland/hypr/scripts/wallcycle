@@ -1,0 +1,45 @@
+#!/bin/bash
+
+WALLDIR="$HOME/Pictures/Wallpapers"
+LASTFILE="/tmp/last_wallpaper"
+
+echo "wallcycle started" >> /tmp/wallcycle.log
+# Transitions
+transitions=("wipe" "grow" "center" "outer" "any")
+
+
+# Ensure directory exists
+if [ ! -d "$WALLDIR" ]; then
+    echo "Wallpaper directory not found: $WALLDIR"
+    exit 1
+fi
+
+while true; do
+    # Shuffle wallpapers
+    mapfile -t images < <(
+        find "$WALLDIR" -type f \( \
+            -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \
+        \) | shuf
+    )
+
+    for img in "${images[@]}"; do
+        # Skip same wallpaper as last
+        if [[ -f "$LASTFILE" && "$img" == "$(cat $LASTFILE)" ]]; then
+            continue
+        fi
+	
+	# Random transition	
+	transition=${transitions[$RANDOM % ${#transitions[@]}]}
+
+        # Set wallpaper with transition
+        awww img "$img" \
+            --transition-type "$transition" \
+            --transition-duration 2 \
+            --transition-fps 60
+
+        echo "$img" > "$LASTFILE"
+
+        sleep 15
+    done
+done
+
