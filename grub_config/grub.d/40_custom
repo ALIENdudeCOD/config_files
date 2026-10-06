@@ -1,0 +1,13 @@
+#!/bin/sh
+exec tail -n +3 $0
+# This file provides an easy way to add custom menu entries.  Simply type the
+# menu entries you want to add after this comment.  Be careful not to change
+# the 'exec tail' line above.
+menuentry "Fedora Linux" {
+    insmod part_gpt
+    insmod ext2
+    search --no-floppy --fs-uuid --set=fedora_boot ba186b0a-8c12-4134-a9e8-4826c55fe2d0
+
+    linux ($fedora_boot)/vmlinuz-7.2.5-200.fc44.x86_64 root=UUID=676013a6-c17c-427a-974a-8e42b9e548fd ro rootflags=subvol=root rhgb quiet
+    initrd ($fedora_boot)/initramfs-7.2.5-200.fc44.x86_64.img
+}
